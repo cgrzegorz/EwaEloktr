@@ -24,18 +24,18 @@
 | L6 | Minus przed j: E_A = −j230 | 10 A | 1991,9 W |
 | L7 | E_A z ujemną częścią rzeczywistą | 23,94 A | 3300 W |
 | L8 | E_A = −127 V i odbiornik 8 − j6 | 12,7 A | 2773,6 W |
-| L9 | Watomierz pokazuje wartość ujemną | 10 A | −1732,1 W |
-| L10 | Ujemny kąt i watomierz „na krzyż” | 10 A | 3000 W |
+| L9 | Watomierz pokazuje wartość ujemną | 10 A | −866 W |
+| L10 | Ujemny kąt E_A | 10 A | 3000 W |
 | P1 | Trzy rezystory | 0 A | 2300 W |
 | P2 | C, R, L i napięcie U_BA | 3,66 A | 750 W |
-| P3 | Symetryczny 30 + j40 bez przewodu N | 8 A | 5097 W |
+| P3 | Symetryczny 30 + j40 | 8 A | 5097 W |
 | P4 | Watomierz na fazie C | 6,35 A | 1209,7 W |
-| P5 | Napięcie pod kątem 30° | 54,64 A | −3810,5 W |
-| P6 | Impedancje pod kątem ±60° | 10 A | 1000 W |
+| P5 | E_A = −220 V | 54,64 A | −3810,5 W |
+| P6 | E_A = −j220 i R, L, C | 10 A | 1905,3 W |
 | P7 | Symetryczny pojemnościowy | 16,26 A | 6258,1 W |
-| P8 | Watomierz „na krzyż”: I_A i U_BC | 12,38 A | 3990,6 W |
+| P8 | Impedancja 12 + j16 i watomierz fazowy | 12,38 A | 2400 W |
 | P9 | E_A = −j200 i impedancja 6 + j8 | 21,18 A | 3464,1 W |
-| P10 | E_A = −100 + j100 – druga ćwiartka | 33,86 A | −4732,1 W |
+| P10 | E_A = −100 + j100 – druga ćwiartka | 33,86 A | 4732,1 W |
 
 ## Część 1 – zadania z opracowaniem (z krasnalem)
 
@@ -293,7 +293,7 @@ _E_A = −110 + j110√3 – najpierw trzeba je zamienić na moduł i kąt. Puł
 
 ### L8. E_A = −127 V i odbiornik 8 − j6
 
-_Minus przed liczbą rzeczywistą to obrót o 180°. Odbiornik symetryczny bez przewodu N, impedancja z „nieokrągłym” kątem._
+_Minus przed liczbą rzeczywistą to obrót o 180°. Odbiornik symetryczny, impedancja z „nieokrągłym” kątem._
 
 **Dane**
 
@@ -301,7 +301,7 @@ _Minus przed liczbą rzeczywistą to obrót o 180°. Odbiornik symetryczny bez p
 - faza A: Z = 8 − j6 Ω (impedancja ogólna)
 - faza B: Z = 8 − j6 Ω (impedancja ogólna)
 - faza C: Z = 8 − j6 Ω (impedancja ogólna)
-- przewód neutralny: BRAK (odbiornik symetryczny)
+- przewód neutralny: TAK, bez impedancji
 - amperomierz: przewód fazy C
 - watomierz: prąd I_A, napięcie U_AB (przewody A → B)
 
@@ -312,14 +312,14 @@ _Minus przed liczbą rzeczywistą to obrót o 180°. Odbiornik symetryczny bez p
 | 1. Źródła | E_A | 127 · e^(j180°) V | −127 V |
 | 1. Źródła | E_B | 127 · e^(j60°) V | 63,5 + j110 V |
 | 1. Źródła | E_C | 127 · e^(−j60°) V | 63,5 − j110 V |
-| 2. Napięcie N–N' | U_N | 0 | odbiornik symetryczny |
+| 2. Napięcie N–N' | U_N | 0 | przewód N bez oporu |
 | 3. Impedancje | Z_A | 10 · e^(−j36,9°) Ω | 8 − j6 Ω |
 | 3. Impedancje | Z_B | 10 · e^(−j36,9°) Ω | 8 − j6 Ω |
 | 3. Impedancje | Z_C | 10 · e^(−j36,9°) Ω | 8 − j6 Ω |
 | 4. Prądy I = U/Z | I_A | 12,7 · e^(−j143,1°) A | −10,16 − j7,62 A |
 | 4. Prądy I = U/Z | I_B | 12,7 · e^(j96,9°) A | −1,519 + j12,61 A |
 | 4. Prądy I = U/Z | I_C | 12,7 · e^(−j23,1°) A | 11,68 − j4,989 A |
-| 5. Kirchhoff | I_A + I_B + I_C | 0 A | 0 A |
+| 5. Kirchhoff | I_N | 0 A | 0 A |
 | 7. Napięcie watomierza | U_AB | 220 (= 127√3) · e^(−j150°) V | −190,5 − j110 V |
 
 - **Amperomierz:** (A) = |I_C| = **12,7 A**
@@ -329,17 +329,17 @@ _Minus przed liczbą rzeczywistą to obrót o 180°. Odbiornik symetryczny bez p
 
 ### L9. Watomierz pokazuje wartość ujemną
 
-_Prąd I_B i napięcie U_CA są skierowane dokładnie przeciwnie. cos 180° = −1, więc wskazanie jest ujemne._
+_Kondensator w fazie A: prąd I_A wyprzedza napięcie o 90°, a U_AC spóźnia się za E_A o 30°. Kąt między nimi to 120°, cos jest ujemny._
 
 **Dane**
 
 - E_A = 100 V
-- faza A: Z_A = jX_L = j10 Ω (cewka)
-- faza B: Z_B = −jX_C = −j10 Ω (kondensator)
+- faza A: Z_A = −jX_C = −j10 Ω (kondensator)
+- faza B: Z_B = jX_L = j10 Ω (cewka)
 - faza C: Z_C = R = 10 Ω (rezystor)
 - przewód neutralny: TAK, bez impedancji
-- amperomierz: przewód fazy A
-- watomierz: prąd I_B, napięcie U_CA (przewody C → A)
+- amperomierz: przewód fazy B
+- watomierz: prąd I_A, napięcie U_AC (przewody A → C)
 
 **Rozwiązanie**
 
@@ -349,23 +349,23 @@ _Prąd I_B i napięcie U_CA są skierowane dokładnie przeciwnie. cos 180° = �
 | 1. Źródła | E_B | 100 · e^(−j120°) V | −50 − j86,6 V |
 | 1. Źródła | E_C | 100 · e^(j120°) V | −50 + j86,6 V |
 | 2. Napięcie N–N' | U_N | 0 | przewód N bez oporu |
-| 3. Impedancje | Z_A | 10 · e^(j90°) Ω | j10 Ω |
-| 3. Impedancje | Z_B | 10 · e^(−j90°) Ω | −j10 Ω |
+| 3. Impedancje | Z_A | 10 · e^(−j90°) Ω | −j10 Ω |
+| 3. Impedancje | Z_B | 10 · e^(j90°) Ω | j10 Ω |
 | 3. Impedancje | Z_C | 10 Ω | 10 Ω |
-| 4. Prądy I = U/Z | I_A | 10 · e^(−j90°) A | −j10 A |
-| 4. Prądy I = U/Z | I_B | 10 · e^(−j30°) A | 8,66 − j5 A |
+| 4. Prądy I = U/Z | I_A | 10 · e^(j90°) A | j10 A |
+| 4. Prądy I = U/Z | I_B | 10 · e^(j150°) A | −8,66 + j5 A |
 | 4. Prądy I = U/Z | I_C | 10 · e^(j120°) A | −5 + j8,66 A |
-| 5. Kirchhoff | I_N | 7,321 · e^(−j60°) A | 3,66 − j6,34 A |
-| 7. Napięcie watomierza | U_CA | 173,2 (= 100√3) · e^(j150°) V | −150 + j86,6 V |
+| 5. Kirchhoff | I_N | 27,32 · e^(j120°) A | −13,66 + j23,66 A |
+| 7. Napięcie watomierza | U_AC | 173,2 (= 100√3) · e^(−j30°) V | 150 − j86,6 V |
 
-- **Amperomierz:** (A) = |I_A| = **10 A**
-- **Watomierz:** φ_U = 150°, φ_I = −30°, ψ = φ_U − φ_I = 180°  
-  P = |U_CA| · |I_B| · cos ψ = 173,2 · 10 · cos(180°) = 173,2 · 10 · (−1) = **−1732,1 W**
+- **Amperomierz:** (A) = |I_B| = **10 A**
+- **Watomierz:** φ_U = −30°, φ_I = 90°, ψ = φ_U − φ_I = −120°  
+  P = |U_AC| · |I_A| · cos ψ = 173,2 · 10 · cos(−120°) = 173,2 · 10 · (−0,5) = **−866 W**
 - _Kontrola:_ całkowita moc czynna odbiornika Σ|I|²·R = 1000 W (watomierz pojedynczy nie musi jej pokazywać).
 
-### L10. Ujemny kąt i watomierz „na krzyż”
+### L10. Ujemny kąt E_A
 
-_E_A = 200·e^(−j30°). Watomierz bierze prąd z fazy C, a napięcie U_BA – oba przewody napięciowe idą do innych faz._
+_E_A = 200·e^(−j30°) – od ujemnego kąta też odejmujemy 120° i 240°. Watomierz w fazie C mierzy napięcie U_CA._
 
 **Dane**
 
@@ -375,7 +375,7 @@ _E_A = 200·e^(−j30°). Watomierz bierze prąd z fazy C, a napięcie U_BA – 
 - faza C: Z_C = 10 − j10√3 Ω (impedancja ogólna)
 - przewód neutralny: TAK, bez impedancji
 - amperomierz: przewód fazy A
-- watomierz: prąd I_C, napięcie U_BA (przewody B → A)
+- watomierz: prąd I_C, napięcie U_CA (przewody C → A)
 
 **Rozwiązanie**
 
@@ -392,11 +392,11 @@ _E_A = 200·e^(−j30°). Watomierz bierze prąd z fazy C, a napięcie U_BA – 
 | 4. Prądy I = U/Z | I_B | 10 · e^(j150°) A | −8,66 + j5 A |
 | 4. Prądy I = U/Z | I_C | 10 · e^(j150°) A | −8,66 + j5 A |
 | 5. Kirchhoff | I_N | 10 · e^(j150°) A | −8,66 + j5 A |
-| 7. Napięcie watomierza | U_BA | 346,4 (= 200√3) · e^(j180°) V | −346,4 V |
+| 7. Napięcie watomierza | U_CA | 346,4 (= 200√3) · e^(j120°) V | −173,2 + j300 V |
 
 - **Amperomierz:** (A) = |I_A| = **10 A**
-- **Watomierz:** φ_U = 180°, φ_I = 150°, ψ = φ_U − φ_I = 30°  
-  P = |U_BA| · |I_C| · cos ψ = 346,4 · 10 · cos(30°) = 346,4 · 10 · 0,866 = **3000 W**
+- **Watomierz:** φ_U = 120°, φ_I = 150°, ψ = φ_U − φ_I = −30°  
+  P = |U_CA| · |I_C| · cos ψ = 346,4 · 10 · cos(−30°) = 346,4 · 10 · 0,866 = **3000 W**
 - _Kontrola:_ całkowita moc czynna odbiornika Σ|I|²·R = 4000 W (watomierz pojedynczy nie musi jej pokazywać).
 
 ## Część 2 – zadania do samodzielnego rozwiązania
@@ -469,7 +469,7 @@ _E_A = 200·e^(−j30°). Watomierz bierze prąd z fazy C, a napięcie U_BA – 
   P = |U_BA| · |I_B| · cos ψ = 173,2 · 5 · cos(−30°) = 173,2 · 5 · 0,866 = **750 W**
 - _Kontrola:_ całkowita moc czynna odbiornika Σ|I|²·R = 500 W (watomierz pojedynczy nie musi jej pokazywać).
 
-### P3. Symetryczny 30 + j40 bez przewodu N
+### P3. Symetryczny 30 + j40
 
 **Dane**
 
@@ -477,7 +477,7 @@ _E_A = 200·e^(−j30°). Watomierz bierze prąd z fazy C, a napięcie U_BA – 
 - faza A: Z = 30 + j40 Ω (impedancja ogólna)
 - faza B: Z = 30 + j40 Ω (impedancja ogólna)
 - faza C: Z = 30 + j40 Ω (impedancja ogólna)
-- przewód neutralny: BRAK (odbiornik symetryczny)
+- przewód neutralny: TAK, bez impedancji
 - amperomierz: przewód fazy A
 - watomierz: prąd I_A, napięcie U_AC (przewody A → C)
 
@@ -488,14 +488,14 @@ _E_A = 200·e^(−j30°). Watomierz bierze prąd z fazy C, a napięcie U_BA – 
 | 1. Źródła | E_A | 400 V | 400 V |
 | 1. Źródła | E_B | 400 · e^(−j120°) V | −200 − j346,4 V |
 | 1. Źródła | E_C | 400 · e^(j120°) V | −200 + j346,4 V |
-| 2. Napięcie N–N' | U_N | 0 | odbiornik symetryczny |
+| 2. Napięcie N–N' | U_N | 0 | przewód N bez oporu |
 | 3. Impedancje | Z_A | 50 · e^(j53,1°) Ω | 30 + j40 Ω |
 | 3. Impedancje | Z_B | 50 · e^(j53,1°) Ω | 30 + j40 Ω |
 | 3. Impedancje | Z_C | 50 · e^(j53,1°) Ω | 30 + j40 Ω |
 | 4. Prądy I = U/Z | I_A | 8 · e^(−j53,1°) A | 4,8 − j6,4 A |
 | 4. Prądy I = U/Z | I_B | 8 · e^(−j173,1°) A | −7,943 − j0,9569 A |
 | 4. Prądy I = U/Z | I_C | 8 · e^(j66,9°) A | 3,143 + j7,357 A |
-| 5. Kirchhoff | I_A + I_B + I_C | 0 A | 0 A |
+| 5. Kirchhoff | I_N | 0 A | 0 A |
 | 7. Napięcie watomierza | U_AC | 692,8 (= 400√3) · e^(−j30°) V | 600 − j346,4 V |
 
 - **Amperomierz:** (A) = |I_A| = **8 A**
@@ -537,11 +537,11 @@ _E_A = 200·e^(−j30°). Watomierz bierze prąd z fazy C, a napięcie U_BA – 
   P = |U_CB| · |I_C| · cos ψ = 220 · 6,35 · cos(−30°) = 220 · 6,35 · 0,866 = **1209,7 W**
 - _Kontrola:_ całkowita moc czynna odbiornika Σ|I|²·R = 1612,9 W (watomierz pojedynczy nie musi jej pokazywać).
 
-### P5. Napięcie pod kątem 30°
+### P5. E_A = −220 V
 
 **Dane**
 
-- E_A = 220·e^(j30°) V
+- E_A = −220 V
 - faza A: Z_A = jX_L = j11 Ω (cewka)
 - faza B: Z_B = R = 11 Ω (rezystor)
 - faza C: Z_C = −jX_C = −j11 Ω (kondensator)
@@ -553,57 +553,57 @@ _E_A = 200·e^(−j30°). Watomierz bierze prąd z fazy C, a napięcie U_BA – 
 
 | Krok | Wielkość | Postać wykładnicza | Postać algebraiczna |
 |---|---|---|---|
-| 1. Źródła | E_A | 220 · e^(j30°) V | 190,5 + j110 V |
-| 1. Źródła | E_B | 220 · e^(−j90°) V | −j220 V |
-| 1. Źródła | E_C | 220 · e^(j150°) V | −190,5 + j110 V |
+| 1. Źródła | E_A | 220 · e^(j180°) V | −220 V |
+| 1. Źródła | E_B | 220 · e^(j60°) V | 110 + j190,5 V |
+| 1. Źródła | E_C | 220 · e^(−j60°) V | 110 − j190,5 V |
 | 2. Napięcie N–N' | U_N | 0 | przewód N bez oporu |
 | 3. Impedancje | Z_A | 11 · e^(j90°) Ω | j11 Ω |
 | 3. Impedancje | Z_B | 11 Ω | 11 Ω |
 | 3. Impedancje | Z_C | 11 · e^(−j90°) Ω | −j11 Ω |
-| 4. Prądy I = U/Z | I_A | 20 · e^(−j60°) A | 10 − j17,32 A |
-| 4. Prądy I = U/Z | I_B | 20 · e^(−j90°) A | −j20 A |
-| 4. Prądy I = U/Z | I_C | 20 · e^(−j120°) A | −10 − j17,32 A |
-| 5. Kirchhoff | I_N | 54,64 · e^(−j90°) A | −j54,64 A |
-| 7. Napięcie watomierza | U_AB | 381,1 (= 220√3) · e^(j60°) V | 190,5 + j330 V |
+| 4. Prądy I = U/Z | I_A | 20 · e^(j90°) A | j20 A |
+| 4. Prądy I = U/Z | I_B | 20 · e^(j60°) A | 10 + j17,32 A |
+| 4. Prądy I = U/Z | I_C | 20 · e^(j30°) A | 17,32 + j10 A |
+| 5. Kirchhoff | I_N | 54,64 · e^(j60°) A | 27,32 + j47,32 A |
+| 7. Napięcie watomierza | U_AB | 381,1 (= 220√3) · e^(−j150°) V | −330 − j190,5 V |
 
 - **Amperomierz:** (A) = |I_N| = **54,64 A**
-- **Watomierz:** φ_U = 60°, φ_I = −60°, ψ = φ_U − φ_I = 120°  
+- **Watomierz:** φ_U = −150°, φ_I = 90°, ψ = φ_U − φ_I = 120°  
   P = |U_AB| · |I_A| · cos ψ = 381,1 · 20 · cos(120°) = 381,1 · 20 · (−0,5) = **−3810,5 W**
 - _Kontrola:_ całkowita moc czynna odbiornika Σ|I|²·R = 4400 W (watomierz pojedynczy nie musi jej pokazywać).
 
-### P6. Impedancje pod kątem ±60°
+### P6. E_A = −j220 i R, L, C
 
 **Dane**
 
-- E_A = 100 V
-- faza A: Z_A = 5 + j5√3 Ω (impedancja ogólna)
-- faza B: Z_B = 10 Ω (rezystor)
-- faza C: Z_C = 5 − j5√3 Ω (impedancja ogólna)
+- E_A = −j220 V
+- faza A: Z_A = R = 22 Ω (rezystor)
+- faza B: Z_B = jX_L = j22 Ω (cewka)
+- faza C: Z_C = −jX_C = −j22 Ω (kondensator)
 - przewód neutralny: TAK, bez impedancji
-- amperomierz: przewód fazy A
-- watomierz: prąd I_B, napięcie U_B (przewód B – N)
+- amperomierz: przewód fazy C
+- watomierz: prąd I_B, napięcie U_BA (przewody B → A)
 
 **Rozwiązanie**
 
 | Krok | Wielkość | Postać wykładnicza | Postać algebraiczna |
 |---|---|---|---|
-| 1. Źródła | E_A | 100 V | 100 V |
-| 1. Źródła | E_B | 100 · e^(−j120°) V | −50 − j86,6 V |
-| 1. Źródła | E_C | 100 · e^(j120°) V | −50 + j86,6 V |
+| 1. Źródła | E_A | 220 · e^(−j90°) V | −j220 V |
+| 1. Źródła | E_B | 220 · e^(j150°) V | −190,5 + j110 V |
+| 1. Źródła | E_C | 220 · e^(j30°) V | 190,5 + j110 V |
 | 2. Napięcie N–N' | U_N | 0 | przewód N bez oporu |
-| 3. Impedancje | Z_A | 10 · e^(j60°) Ω | 5 + j8,66 Ω |
-| 3. Impedancje | Z_B | 10 Ω | 10 Ω |
-| 3. Impedancje | Z_C | 10 · e^(−j60°) Ω | 5 − j8,66 Ω |
-| 4. Prądy I = U/Z | I_A | 10 · e^(−j60°) A | 5 − j8,66 A |
-| 4. Prądy I = U/Z | I_B | 10 · e^(−j120°) A | −5 − j8,66 A |
-| 4. Prądy I = U/Z | I_C | 10 · e^(j180°) A | −10 A |
-| 5. Kirchhoff | I_N | 20 · e^(−j120°) A | −10 − j17,32 A |
-| 7. Napięcie watomierza | U_B | 100 · e^(−j120°) V | −50 − j86,6 V |
+| 3. Impedancje | Z_A | 22 Ω | 22 Ω |
+| 3. Impedancje | Z_B | 22 · e^(j90°) Ω | j22 Ω |
+| 3. Impedancje | Z_C | 22 · e^(−j90°) Ω | −j22 Ω |
+| 4. Prądy I = U/Z | I_A | 10 · e^(−j90°) A | −j10 A |
+| 4. Prądy I = U/Z | I_B | 10 · e^(j60°) A | 5 + j8,66 A |
+| 4. Prądy I = U/Z | I_C | 10 · e^(j120°) A | −5 + j8,66 A |
+| 5. Kirchhoff | I_N | 7,321 · e^(j90°) A | j7,321 A |
+| 7. Napięcie watomierza | U_BA | 381,1 (= 220√3) · e^(j120°) V | −190,5 + j330 V |
 
-- **Amperomierz:** (A) = |I_A| = **10 A**
-- **Watomierz:** φ_U = −120°, φ_I = −120°, ψ = φ_U − φ_I = 0°  
-  P = |U_B| · |I_B| · cos ψ = 100 · 10 · cos(0°) = 100 · 10 · 1 = **1000 W**
-- _Kontrola:_ całkowita moc czynna odbiornika Σ|I|²·R = 2000 W (watomierz pojedynczy nie musi jej pokazywać).
+- **Amperomierz:** (A) = |I_C| = **10 A**
+- **Watomierz:** φ_U = 120°, φ_I = 60°, ψ = φ_U − φ_I = 60°  
+  P = |U_BA| · |I_B| · cos ψ = 381,1 · 10 · cos(60°) = 381,1 · 10 · 0,5 = **1905,3 W**
+- _Kontrola:_ całkowita moc czynna odbiornika Σ|I|²·R = 2200 W (watomierz pojedynczy nie musi jej pokazywać).
 
 ### P7. Symetryczny pojemnościowy
 
@@ -639,7 +639,7 @@ _E_A = 200·e^(−j30°). Watomierz bierze prąd z fazy C, a napięcie U_BA – 
   P = |U_CA| · |I_C| · cos ψ = 398,4 · 16,26 · cos(−15°) = 398,4 · 16,26 · 0,966 = **6258,1 W**
 - _Kontrola:_ całkowita moc czynna odbiornika Σ|I|²·R = 7935 W (watomierz pojedynczy nie musi jej pokazywać).
 
-### P8. Watomierz „na krzyż”: I_A i U_BC
+### P8. Impedancja 12 + j16 i watomierz fazowy
 
 **Dane**
 
@@ -649,7 +649,7 @@ _E_A = 200·e^(−j30°). Watomierz bierze prąd z fazy C, a napięcie U_BA – 
 - faza C: Z_C = 24 Ω (rezystor)
 - przewód neutralny: TAK, bez impedancji
 - amperomierz: przewód neutralny
-- watomierz: prąd I_A, napięcie U_BC (przewody B → C)
+- watomierz: prąd I_C, napięcie U_C (przewód C – N)
 
 **Rozwiązanie**
 
@@ -666,11 +666,11 @@ _E_A = 200·e^(−j30°). Watomierz bierze prąd z fazy C, a napięcie U_BA – 
 | 4. Prądy I = U/Z | I_B | 10 · e^(−j30°) A | 8,66 − j5 A |
 | 4. Prądy I = U/Z | I_C | 10 · e^(j120°) A | −5 + j8,66 A |
 | 5. Kirchhoff | I_N | 12,38 · e^(−j28,7°) A | 10,86 − j5,94 A |
-| 7. Napięcie watomierza | U_BC | 415,7 (= 240√3) · e^(−j90°) V | −j415,7 V |
+| 7. Napięcie watomierza | U_C | 240 · e^(j120°) V | −120 + j207,8 V |
 
 - **Amperomierz:** (A) = |I_N| = **12,38 A**
-- **Watomierz:** φ_U = −90°, φ_I = −53,1°, ψ = φ_U − φ_I = −36,9°  
-  P = |U_BC| · |I_A| · cos ψ = 415,7 · 12 · cos(−36,9°) = 415,7 · 12 · 0,8 = **3990,6 W**
+- **Watomierz:** φ_U = 120°, φ_I = 120°, ψ = φ_U − φ_I = 0°  
+  P = |U_C| · |I_C| · cos ψ = 240 · 10 · cos(0°) = 240 · 10 · 1 = **2400 W**
 - _Kontrola:_ całkowita moc czynna odbiornika Σ|I|²·R = 4128 W (watomierz pojedynczy nie musi jej pokazywać).
 
 ### P9. E_A = −j200 i impedancja 6 + j8
@@ -717,7 +717,7 @@ _E_A = 200·e^(−j30°). Watomierz bierze prąd z fazy C, a napięcie U_BA – 
 - faza C: Z_C = 5 − j5 Ω (impedancja ogólna)
 - przewód neutralny: TAK, bez impedancji
 - amperomierz: przewód neutralny
-- watomierz: prąd I_C, napięcie U_AC (przewody A → C)
+- watomierz: prąd I_C, napięcie U_CA (przewody C → A)
 
 **Rozwiązanie**
 
@@ -734,9 +734,9 @@ _E_A = 200·e^(−j30°). Watomierz bierze prąd z fazy C, a napięcie U_BA – 
 | 4. Prądy I = U/Z | I_B | 14,14 (= 10√2) · e^(j15°) A | 13,66 + j3,66 A |
 | 4. Prądy I = U/Z | I_C | 20 · e^(−j60°) A | 10 − j17,32 A |
 | 5. Kirchhoff | I_N | 33,86 · e^(−j6,2°) A | 33,66 − j3,66 A |
-| 7. Napięcie watomierza | U_AC | 244,9 (= 100√6) · e^(j105°) V | −63,4 + j236,6 V |
+| 7. Napięcie watomierza | U_CA | 244,9 (= 100√6) · e^(−j75°) V | 63,4 − j236,6 V |
 
 - **Amperomierz:** (A) = |I_N| = **33,86 A**
-- **Watomierz:** φ_U = 105°, φ_I = −60°, ψ = φ_U − φ_I = 165°  
-  P = |U_AC| · |I_C| · cos ψ = 244,9 · 20 · cos(165°) = 244,9 · 20 · (−0,966) = **−4732,1 W**
+- **Watomierz:** φ_U = −75°, φ_I = −60°, ψ = φ_U − φ_I = −15°  
+  P = |U_CA| · |I_C| · cos ψ = 244,9 · 20 · cos(−15°) = 244,9 · 20 · 0,966 = **4732,1 W**
 - _Kontrola:_ całkowita moc czynna odbiornika Σ|I|²·R = 4000 W (watomierz pojedynczy nie musi jej pokazywać).
