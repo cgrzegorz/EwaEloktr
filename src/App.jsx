@@ -45,13 +45,13 @@ function Home({ go, progress }) {
             rozwiązania, który działa w każdym zadaniu – z wykresem wskazowym, amperomierzem i watomierzem.
           </p>
           <div className="hero-btns">
-            <button className="btn primary big" onClick={() => go('nauka')}>Ucz się z krasnalem (5 zadań)</button>
-            <button className="btn big" onClick={() => go('cwiczenia')}>Sprawdź się (8 zadań) · {solved}/8</button>
+            <button className="btn primary big" onClick={() => go('nauka')}>Ucz się z krasnalem ({LEARN.length} zadań)</button>
+            <button className="btn big" onClick={() => go('cwiczenia')}>Sprawdź się ({PRACTICE.length} zadań) · {solved}/{PRACTICE.length}</button>
           </div>
         </div>
         <div className="hero-gnome">
           <Gnome
-            text="Jestem Omek! Przeprowadzę Cię przez każdy krok. Na kolokwium zawsze idziemy tą samą drogą – poznasz ją w 5 zadaniach, a potem sprawdzisz się w 8 kolejnych."
+            text="Jestem Omek! Przeprowadzę Cię przez każdy krok. Na kolokwium zawsze idziemy tą samą drogą – poznasz ją w 10 zadaniach, a potem sprawdzisz się w 10 kolejnych. Będą też liczby ujemne – nie bój się minusów!"
             mood="happy"
             size={120}
           />

@@ -1,5 +1,5 @@
 import { solve, zKind, PH, wattVoltName } from './solver.js'
-import { abs, arg, normDeg, fmtNum, fmtDeg, RAD, C, niceRoot } from './complex.js'
+import { abs, arg, normDeg, fmtNum, fmtDeg, RAD, C, niceRoot, polar } from './complex.js'
 import { tn, tdeg, tpol, talg, tparen, tunit } from './tex.js'
 import { Eq, Rich } from '../components/MathText.jsx'
 import { PHASE_COLOR } from '../components/Phasor.jsx'
@@ -75,21 +75,42 @@ export function buildSteps(task) {
   })
 
   /* 1. Napięcia źródeł */
-  const EAgivenJ = /j/.test(task.EAtext) && !/e\^/.test(task.EAtext)
+  const given = task.EAtext.replace('E_A = ', '').replace(/ V$/, '')
+  const algebraic = !/e\^/.test(task.EAtext) && (/j/.test(given) || /^[−-]/.test(given))
+  const twoParts = algebraic && /\d\s*[+−-]\s*j/.test(given)
+  const EAc = polar(Emod, EAang)
+  let eIntro = ''
+  if (twoParts)
+    eIntro = `Najpierw tłumaczymy dane: E_A = ${given} V to punkt na płaszczyźnie zespolonej (x = ${fmtNum(EAc.re)}, y = ${fmtNum(EAc.im)}). Moduł liczymy z Pitagorasa, kąt z arctg. ${EAc.re < 0 ? 'UWAGA: część rzeczywista jest UJEMNA, więc punkt leży po lewej stronie i do wyniku arctg dodajemy 180°! ' : ''}`
+  else if (algebraic && /^[−-]j/.test(given))
+    eIntro = `Najpierw tłumaczymy dane: ${given} to ${fmtNum(Emod)} V pod kątem −90°, bo $-j = e^{-j90^\\circ}$. Minus przed j obraca strzałkę w dół. `
+  else if (algebraic && /^j/.test(given))
+    eIntro = `Najpierw tłumaczymy dane: ${given} to ${fmtNum(Emod)} V pod kątem 90°, bo $j = e^{j90^\\circ}$. `
+  else if (algebraic && /^[−-]/.test(given))
+    eIntro = `Najpierw tłumaczymy dane: ${given} V to ${fmtNum(Emod)} V pod kątem 180°, bo $-1 = e^{j180^\\circ}$ – minus to obrót o pół koła. `
+  else if (EAang < 0)
+    eIntro = `Kąt E_A jest ujemny – nie szkodzi! Od niego też odejmujemy 120° i 240°, a wynik sprowadzamy do przedziału od −180° do 180°. `
   steps.push({
     key: 'E',
     title: 'Krok 1. Napięcia źródeł',
-    mood: 'talk',
+    mood: eIntro ? 'think' : 'talk',
     highlight: ['E'],
     gnome:
-      (EAgivenJ ? `Najpierw tłumaczymy dane: ${task.EAtext.replace('E_A = ', '').replace(' V', '')} to ${Emod} V pod kątem ${fmtNum(EAang)}°, bo j = e^{j90°}. ` : '') +
-      `Dostajemy tylko E_A. Źródła B i C mają tę samą wartość ${Emod} V, tylko są obrócone: od kąta E_A odejmujemy 120° (faza B) i 240° (faza C). Kąty odejmujemy, bo B i C „spóźniają się” za A.`,
-    trap: `−240° i +120° to ten sam kierunek (różnią się o pełny obrót 360°). Prowadząca często pisze $E_{\\mathrm C} = E\\,e^{j120^\\circ}$.`,
+      eIntro +
+      `Dostajemy tylko E_A. Źródła B i C mają tę samą wartość ${fmtNum(Emod)} V, tylko są obrócone: od kąta E_A odejmujemy 120° (faza B) i 240° (faza C). Kąty odejmujemy, bo B i C „spóźniają się” za A.`,
+    trap: twoParts
+      ? `Kalkulator i arctg „nie wiedzą”, w której ćwiartce jest punkt: $\\operatorname{arctg}\\frac{${tn(EAc.im)}}{${tn(EAc.re)}} = ${tdeg(Math.atan(EAc.im / EAc.re) / RAD)}$, a prawdziwy kąt to ${fmtDeg(EAang)}. Zawsze patrz na znaki x i y!`
+      : `−240° i +120° to ten sam kierunek (różnią się o pełny obrót 360°). Prowadząca często pisze $E_{\\mathrm C} = E\\,e^{j120^\\circ}$.`,
     content: (
       <>
-        <Eq tex={`${sym('E', 'A')} = ${tpol(null, { mod: Emod, deg: EAang, unit: 'V' })}`} />
-        <Eq tex={`${sym('E', 'B')} = ${sym('E', 'A')}\\,e^{-j120^\\circ} = ${tn(Emod)}\\,e^{${angDiff(EAang, 120)}} = ${tpol(s.E.B, { unit: 'V' })}`} />
-        <Eq tex={`${sym('E', 'C')} = ${sym('E', 'A')}\\,e^{-j240^\\circ} = ${tn(Emod)}\\,e^{${angDiff(EAang, 240)}} = ${tpol(s.E.C, { unit: 'V' })}`} />
+        {twoParts && (
+          <Eq
+            tex={`\\begin{aligned} ${sym('E', 'A')} &= ${talg(EAc, 'V')} \\\\ |${sym('E', 'A')}| &= \\sqrt{(${tn(EAc.re)})^2 + (${tn(EAc.im)})^2} = ${niceRoot(Emod) ? `${tpol(null, { mod: Emod, deg: 0, root: true })} \\approx ${tn(Emod)}` : tn(Emod)}\\,\\mathrm{V} \\\\ \\varphi &= \\operatorname{arctg}\\frac{${tn(EAc.im)}}{${tn(EAc.re)}}${EAc.re < 0 ? ' + 180^\\circ' : ''} = ${tdeg(EAang)} \\end{aligned}`}
+          />
+        )}
+        <Eq tex={`${sym('E', 'A')} = ${algebraic && !twoParts ? talg(EAc) + ' = ' : ''}${tpol(null, { mod: Emod, deg: EAang, unit: 'V', root: true })}`} />
+        <Eq tex={`${sym('E', 'B')} = ${sym('E', 'A')}\\,e^{-j120^\\circ} = ${tpol(null, { mod: Emod, deg: 0, root: true })}\\,e^{${angDiff(EAang, 120)}} = ${tpol(s.E.B, { unit: 'V' })}`} />
+        <Eq tex={`${sym('E', 'C')} = ${sym('E', 'A')}\\,e^{-j240^\\circ} = ${tpol(null, { mod: Emod, deg: 0, root: true })}\\,e^{${angDiff(EAang, 240)}} = ${tpol(s.E.C, { unit: 'V' })}`} />
       </>
     ),
     diagram: { vectors: vEs(s, false), arcs: [] },
@@ -310,7 +331,7 @@ export function buildSteps(task) {
     trap: `Nie mylimy kąta $\\varphi_U - \\varphi_I$ z kątem samego prądu ani z kątem impedancji! Kąt impedancji to przesunięcie między U_${iw} a I_${iw} – a watomierz może mierzyć inne napięcie.`,
     content: (
       <Eq
-        tex={`\\begin{aligned} \\varphi_U &= ${tdeg(phiU)}, \\qquad \\varphi_I = ${tdeg(phiI)} \\\\ \\psi &= \\varphi_U - \\varphi_I = ${tdeg(phiU)} - (${tdeg(phiI)}) = ${tdeg(psi)} \\\\ P &= |${UwSym}|\\cdot|${sym('I', iw)}|\\cdot\\cos\\psi \\\\ &= ${tn(abs(Uw))}\\cdot ${tn(abs(s.I[iw]))}\\cdot\\cos(${tdeg(psi)}) \\\\ &= ${tn(abs(Uw))}\\cdot ${tn(abs(s.I[iw]))}\\cdot ${tn(Math.cos(psi * RAD), { digits: 3 })} = \\boxed{${tn(P)}\\,\\mathrm{W}} \\end{aligned}`}
+        tex={`\\begin{aligned} \\varphi_U &= ${tdeg(phiU)}, \\qquad \\varphi_I = ${tdeg(phiI)} \\\\ \\psi &= \\varphi_U - \\varphi_I = ${tdeg(phiU)} - (${tdeg(phiI)}) = ${tdeg(psi)} \\\\ P &= |${UwSym}|\\cdot|${sym('I', iw)}|\\cdot\\cos\\psi \\\\ &= ${tn(abs(Uw))}\\cdot ${tn(abs(s.I[iw]))}\\cdot\\cos(${tdeg(psi)}) \\\\ &= ${tn(abs(Uw))}\\cdot ${tn(abs(s.I[iw]))}\\cdot ${Math.cos(psi * RAD) < -1e-9 ? `(${tn(Math.cos(psi * RAD), { digits: 3 })})` : tn(Math.cos(psi * RAD), { digits: 3 })} = \\boxed{${tn(P)}\\,\\mathrm{W}} \\end{aligned}`}
       />
     ),
     diagram: {
