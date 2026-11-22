@@ -2,7 +2,8 @@ import { useMemo, useState } from 'react'
 import Gnome from './Gnome.jsx'
 import Circuit from './Circuit.jsx'
 import Phasor, { PHASE_COLOR } from './Phasor.jsx'
-import { Rich, Pol } from './MathText.jsx'
+import { Rich, Tex } from './MathText.jsx'
+import { tpol } from '../lib/tex.js'
 import { practiceFields, checkField } from '../lib/check.js'
 import { PH, wattVoltName } from '../lib/solver.js'
 
@@ -132,7 +133,7 @@ export default function Practice({ task, onExit, onSolved, onShowSolution }) {
               <div className="locked">
                 <p>🔒 Wykres odblokuje się, gdy wszystkie wyniki będą poprawne.</p>
                 <p className="small muted">
-                  Narysuj go najpierw sam na kartce: E<sub>A</sub> = <Pol z={sol.E.A} unit="V" /> – od niego zaczynasz.
+                  Narysuj go najpierw sam na kartce – zacznij od <Tex>{`E_{\\mathrm A} = ${tpol(sol.E.A, { unit: 'V' })}`}</Tex>.
                 </p>
               </div>
             )}

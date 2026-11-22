@@ -36,7 +36,7 @@ function LineVoltageDemo() {
           </div>
         </div>
         <p className="small">
-          <Rich>{`U_{${pair}} = E_${x} − E_${y}`}</Rich> — strzałka od końca <Rich>{`E_${y}`}</Rich> do końca <Rich>{`E_${x}`}</Rich>.
+          <Rich>{`$U_{${pair}} = E_${x} - E_${y}$`}</Rich> — strzałka od końca <Rich>{`E_${y}`}</Rich> do końca <Rich>{`E_${x}`}</Rich>.
           Kąt: <b>{fmtDeg(arg(U))}</b> = kąt <Rich>{`E_${x}`}</Rich> ({fmtDeg(arg(E[x]))}) {['AB', 'BC', 'CA'].includes(pair) ? '+ 30°' : '− 30°'}.
         </p>
       </div>
@@ -65,9 +65,9 @@ export default function Cheatsheet() {
         <div className="card">
           <h3>Postać wykładnicza ↔ algebraiczna</h3>
           <ul className="small">
-            <li><Rich>{'A·e^{jφ} = A·cos φ + j·A·sin φ'}</Rich></li>
-            <li><Rich>{'x + jy → |A| = √(x² + y²), φ = arctg(y/x)'}</Rich> (gdy x &lt; 0: +180°)</li>
-            <li><Rich>{'j = e^{j90°}, −j = e^{−j90°}, −1 = e^{j180°}'}</Rich></li>
+            <li><Rich>{'$A\\,e^{j\\varphi} = A\\cos\\varphi + jA\\sin\\varphi$'}</Rich></li>
+            <li><Rich>{'$x + jy \\;\\Rightarrow\\; |A| = \\sqrt{x^2 + y^2},\\ \\varphi = \\operatorname{arctg}\\frac{y}{x}$'}</Rich> (gdy x &lt; 0: +180°)</li>
+            <li><Rich>{'$j = e^{j90^\\circ},\\quad -j = e^{-j90^\\circ},\\quad -1 = e^{j180^\\circ}$'}</Rich></li>
             <li><b>Mnożenie / dzielenie</b> – wykładniczo: moduły mnożymy / dzielimy, kąty dodajemy / odejmujemy.</li>
             <li><b>Dodawanie / odejmowanie</b> – tylko algebraicznie (x + jy).</li>
           </ul>
@@ -75,20 +75,20 @@ export default function Cheatsheet() {
         <div className="card">
           <h3>Gwiazda, U_N = 0</h3>
           <ul className="small">
-            <li><Rich>{'E_B = E_A·e^{−j120°}, E_C = E_A·e^{−j240°} = E_A·e^{j120°}'}</Rich></li>
-            <li>Przewód N bez oporu albo odbiornik symetryczny ⇒ <Rich>{'U_N = 0'}</Rich> ⇒ <Rich>{'U_A = E_A'}</Rich> itd.</li>
-            <li><Rich>{'I_A = U_A / Z_A'}</Rich> (prawo Ohma)</li>
-            <li><Rich>{'I_N = I_A + I_B + I_C'}</Rich> (I prawo Kirchhoffa)</li>
+            <li><Rich>{'$E_B = E_A\\,e^{-j120^\\circ},\\quad E_C = E_A\\,e^{-j240^\\circ} = E_A\\,e^{j120^\\circ}$'}</Rich></li>
+            <li>Przewód N bez oporu albo odbiornik symetryczny ⇒ <Rich>{'$U_N = 0 \\Rightarrow U_A = E_A$'}</Rich> itd.</li>
+            <li><Rich>{'$I_A = \\dfrac{U_A}{Z_A}$'}</Rich> (prawo Ohma)</li>
+            <li><Rich>{'$I_N = I_A + I_B + I_C$'}</Rich> (I prawo Kirchhoffa)</li>
             <li>R: prąd w fazie z napięciem · L: prąd spóźnia się o 90° · C: prąd wyprzedza o 90°</li>
           </ul>
         </div>
         <div className="card">
           <h3>Przyrządy</h3>
           <ul className="small">
-            <li><b>Amperomierz</b>: moduł prądu w swoim przewodzie, np. <Rich>{'(A) = |I_C|'}</Rich>.</li>
-            <li><b>Watomierz</b>: <Rich>{'P = |U|·|I|·cos ψ'}</Rich>, gdzie <Rich>{'ψ = φ_U − φ_I'}</Rich>.</li>
-            <li>Cewka napięciowa przewód–N: <Rich>{'U = U_A'}</Rich> (fazowe).</li>
-            <li>Cewka napięciowa przewód–przewód: <Rich>{'U_{AB} = U_A − U_B'}</Rich>, <Rich>{'|U_{AB}| = √3·|E|'}</Rich>.</li>
+            <li><b>Amperomierz</b>: moduł prądu w swoim przewodzie, np. <Rich>{'$\\text{(A)} = |I_C|$'}</Rich>.</li>
+            <li><b>Watomierz</b>: <Rich>{'$P = |U|\\cdot|I|\\cdot\\cos\\psi$'}</Rich>, gdzie <Rich>{'$\\psi = \\varphi_U - \\varphi_I$'}</Rich>.</li>
+            <li>Cewka napięciowa przewód–N: <Rich>{'$U = U_A$'}</Rich> (fazowe).</li>
+            <li>Cewka napięciowa przewód–przewód: <Rich>{'$U_{AB} = U_A - U_B$'}</Rich>, <Rich>{'$|U_{AB}| = \\sqrt{3}\\,|E|$'}</Rich>.</li>
             <li>Zgodnie z kolejnością (AB, BC, CA): kąt = kąt pierwszej fazy + 30°. Odwrotnie (BA, CB, AC): − 30°.</li>
             <li>P może wyjść 0 (ψ = 90°) albo ujemne (|ψ| &gt; 90°) – to poprawne wyniki.</li>
           </ul>

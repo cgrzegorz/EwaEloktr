@@ -1,53 +1,43 @@
 import { solve, zKind, PH, wattVoltName } from './solver.js'
 import { abs, arg, normDeg, fmtNum, fmtDeg, RAD, C, niceRoot } from './complex.js'
-import { S, Pol, Alg, Deg, N, Eq, Exp, Rich } from '../components/MathText.jsx'
+import { tn, tdeg, tpol, talg, tparen, tunit } from './tex.js'
+import { Eq, Rich } from '../components/MathText.jsx'
 import { PHASE_COLOR } from '../components/Phasor.jsx'
 
 const where = (x) => (x === 'N' ? 'przewodzie neutralnym' : `przewodzie fazy ${x}`)
 const isForward = (a, b) => ['AB', 'BC', 'CA'].includes(a + b)
+const R = (p) => `\\mathrm{${p}}` // indeks pisany prosto
+const sym = (b, p) => `${b}_{${R(p)}}`
 
 /* ---------- wektory do wykresu ---------- */
-const vE = (s, p, withU = true) => ({
-  id: 'E' + p,
-  z: s.E[p],
-  kind: 'U',
-  label: withU ? `E${p}=U` : 'E',
-  sub: withU ? p : p,
-  color: PHASE_COLOR[p],
-})
 const vEs = (s, withU) =>
-  PH.map((p) => ({ ...vE(s, p, withU), label: withU ? 'E,U' : 'E', sub: p }))
+  PH.map((p) => ({ id: 'E' + p, z: s.E[p], kind: 'U', label: withU ? 'E,U' : 'E', sub: p, color: PHASE_COLOR[p] }))
 const vIs = (s) => PH.map((p) => ({ id: 'I' + p, z: s.I[p], kind: 'I', label: 'I', sub: p, color: PHASE_COLOR[p], width: 2.2 }))
 
-function nDegTerm(a, b, op) {
-  // zapis „j(90 − 45)” z liczbami
-  const f = (x) => fmtNum(x, { digits: 1 })
-  const bb = op === '-' ? (b < 0 ? `+ ${f(-b)}` : `− ${f(b)}`) : b < 0 ? `− ${f(-b)}` : `+ ${f(b)}`
-  return `${f(a)} ${bb}`
+/** „(90° − 45°)” w wykładniku */
+function angDiff(a, b) {
+  const f = (x) => tn(Math.round(x * 10) / 10, { digits: 1 })
+  return `j(${f(a)}^\\circ ${b < 0 ? '+' : '-'} ${f(Math.abs(b))}^\\circ)`
 }
 
-/** Krok: zamiana na postać algebraiczną cos/sin (ciekawostka). */
-function CosSin({ name, sub, z }) {
+/** Ciekawostka: rozpisanie na cos + j sin */
+function cosSinTex(name, p, z) {
   const m = abs(z)
   const a = arg(z)
   const c = Math.cos(a * RAD)
   const sn = Math.sin(a * RAD)
-  return (
-    <Eq>
-      <S b={name} s={sub} /> = {fmtNum(m)}(cos {fmtDeg(a)} + j·sin {fmtDeg(a)}) = {fmtNum(m)}({fmtNum(c, { digits: 3 })}{' '}
-      {sn < 0 ? '−' : '+'} j{fmtNum(Math.abs(sn), { digits: 3 })}) = <Alg z={z} />
-    </Eq>
-  )
+  return `${sym(name, p)} = ${tn(m)}\\left(\\cos ${tdeg(a)} + j\\sin ${tdeg(a)}\\right) = ${tn(m)}\\left(${tn(c, { digits: 3 })} ${sn < 0 ? '-' : '+'} j${tn(Math.abs(sn), { digits: 3 })}\\right) = ${talg(z)}`
 }
 
 export function buildSteps(task) {
   const s = solve(task)
   const w = task.watt
   const vn = wattVoltName(w)
-  const vSub = vn
   const steps = []
   const EAang = task.EA.ang
   const Emod = task.EA.mod
+  const Uw = s.Uw
+  const UwSym = sym('U', vn)
 
   /* 0. Czytamy schemat */
   steps.push({
@@ -75,7 +65,7 @@ export function buildSteps(task) {
         </ul>
         <h4>Szukamy</h4>
         <ul className="data">
-          <li>prądów <S b="I" s="A" />, <S b="I" s="B" />, <S b="I" s="C" /> {task.neutral && <>i <S b="I" s="N" /></>}</li>
+          <li><Rich>{`prądów $I_{\\mathrm A}, I_{\\mathrm B}, I_{\\mathrm C}$${task.neutral ? ' i $I_{\\mathrm N}$' : ''}`}</Rich></li>
           <li>wskazania amperomierza i watomierza</li>
           <li>wykresu wskazowego (rysujemy go równolegle z obliczeniami)</li>
         </ul>
@@ -92,20 +82,14 @@ export function buildSteps(task) {
     mood: 'talk',
     highlight: ['E'],
     gnome:
-      (EAgivenJ ? `Najpierw tłumaczymy dane: ${task.EAtext.replace('E_A = ', '')} to ${Emod} V pod kątem ${fmtNum(EAang)}° (j to obrót o 90°). ` : '') +
+      (EAgivenJ ? `Najpierw tłumaczymy dane: ${task.EAtext.replace('E_A = ', '').replace(' V', '')} to ${Emod} V pod kątem ${fmtNum(EAang)}°, bo j = e^{j90°}. ` : '') +
       `Dostajemy tylko E_A. Źródła B i C mają tę samą wartość ${Emod} V, tylko są obrócone: od kąta E_A odejmujemy 120° (faza B) i 240° (faza C). Kąty odejmujemy, bo B i C „spóźniają się” za A.`,
-    trap: `−240° i +120° to ten sam kierunek (różnią się o pełny obrót 360°). Prowadząca często pisze E_C = …·e^{j120°}.`,
+    trap: `−240° i +120° to ten sam kierunek (różnią się o pełny obrót 360°). Prowadząca często pisze $E_{\\mathrm C} = E\\,e^{j120^\\circ}$.`,
     content: (
       <>
-        <Eq>
-          <S b="E" s="A" /> = <Pol mod={Emod} deg={EAang} unit="V" />
-        </Eq>
-        <Eq>
-          <S b="E" s="B" /> = {Emod}·e<sup>j({nDegTerm(EAang, 120, '-')})°</sup> = <Pol z={s.E.B} unit="V" />
-        </Eq>
-        <Eq>
-          <S b="E" s="C" /> = {Emod}·e<sup>j({nDegTerm(EAang, 240, '-')})°</sup> = <Pol z={s.E.C} unit="V" />
-        </Eq>
+        <Eq tex={`${sym('E', 'A')} = ${tpol(null, { mod: Emod, deg: EAang, unit: 'V' })}`} />
+        <Eq tex={`${sym('E', 'B')} = ${sym('E', 'A')}\\,e^{-j120^\\circ} = ${tn(Emod)}\\,e^{${angDiff(EAang, 120)}} = ${tpol(s.E.B, { unit: 'V' })}`} />
+        <Eq tex={`${sym('E', 'C')} = ${sym('E', 'A')}\\,e^{-j240^\\circ} = ${tn(Emod)}\\,e^{${angDiff(EAang, 240)}} = ${tpol(s.E.C, { unit: 'V' })}`} />
       </>
     ),
     diagram: { vectors: vEs(s, false), arcs: [] },
@@ -118,17 +102,13 @@ export function buildSteps(task) {
     mood: 'think',
     highlight: task.neutral ? ['N'] : ['Z'],
     gnome: task.neutral
-      ? `Przewód neutralny bez oporu łączy N i N' – elektrycznie to ten sam punkt, więc napięcie między nimi U_N = 0. Każda faza odbiornika dostaje dokładnie napięcie swojego źródła: U = E − U_N = E. To ogromne ułatwienie – każda faza to osobny, prosty obwód!`
+      ? `Przewód neutralny bez oporu łączy N i N' – elektrycznie to ten sam punkt, więc napięcie między nimi U_N = 0. Każda faza odbiornika dostaje dokładnie napięcie swojego źródła: $U = E - U_N = E$. To ogromne ułatwienie – każda faza to osobny, prosty obwód!`
       : `Nie ma przewodu neutralnego, ale odbiornik jest symetryczny (trzy identyczne Z). Prądy będą tej samej wielkości, przesunięte o 120°, i same zsumują się do zera. Nic nie „ciągnie” punktu N', więc U_N = 0.`,
     content: (
       <>
-        <Eq note={task.neutral ? 'przewód neutralny bez impedancji' : 'odbiornik symetryczny'}>
-          <S b="U" s="N" /> = 0
-        </Eq>
+        <Eq tex={`${sym('U', 'N')} = 0`} note={task.neutral ? 'przewód neutralny bez impedancji' : 'odbiornik symetryczny'} />
         {PH.map((p) => (
-          <Eq key={p}>
-            <S b="U" s={p} /> = <S b="E" s={p} /> − <S b="U" s="N" /> = <S b="E" s={p} /> = <Pol z={s.U[p]} unit="V" />
-          </Eq>
+          <Eq key={p} tex={`${sym('U', p)} = ${sym('E', p)} - ${sym('U', 'N')} = ${sym('E', p)} = ${tpol(s.U[p], { unit: 'V' })}`} />
         ))}
       </>
     ),
@@ -141,15 +121,16 @@ export function buildSteps(task) {
     const k = zKind(z)
     const m = abs(z)
     const a = arg(z)
-    if (k === 'R') return <Eq key={p}><S b="Z" s={p} /> = R = {fmtNum(m)} Ω <span className="muted">(kąt 0°)</span></Eq>
-    if (k === 'L') return <Eq key={p}><S b="Z" s={p} /> = jX<sub>L</sub> = j{fmtNum(m)} = <Pol mod={m} deg={90} unit="Ω" /></Eq>
-    if (k === 'C') return <Eq key={p}><S b="Z" s={p} /> = −jX<sub>C</sub> = −j{fmtNum(m)} = <Pol mod={m} deg={-90} unit="Ω" /></Eq>
-    const r = niceRoot(m)
+    const Z = sym('Z', p)
+    if (k === 'R') return <Eq key={p} tex={`${Z} = R = ${tn(m)}${tunit('Ω')} = ${tn(m)}\\,e^{j0^\\circ}${tunit('Ω')}`} />
+    if (k === 'L') return <Eq key={p} tex={`${Z} = jX_L = j${tn(m)}${tunit('Ω')} = ${tpol(null, { mod: m, deg: 90, unit: 'Ω' })}`} />
+    if (k === 'C') return <Eq key={p} tex={`${Z} = -jX_C = -j${tn(m)}${tunit('Ω')} = ${tpol(null, { mod: m, deg: -90, unit: 'Ω' })}`} />
+    const quad = z.re < 0 ? ' + 180^\\circ' : ''
     return (
-      <Eq key={p} note={`φ = arctg(${fmtNum(z.im)} / ${fmtNum(z.re)}) = ${fmtDeg(a)}`}>
-        <S b="Z" s={p} /> = <Alg z={z} /> ⇒ |<S b="Z" s={p} />| = √({fmtNum(z.re)}² + {fmtNum(z.im)}²) = {fmtNum(m)}
-        {r && <span className="root"> (={r})</span>} ⇒ <S b="Z" s={p} /> = <Pol mod={m} deg={a} unit="Ω" />
-      </Eq>
+      <Eq
+        key={p}
+        tex={`\\begin{aligned} ${Z} &= ${talg(z, 'Ω')} \\\\ |${Z}| &= \\sqrt{${tn(z.re)}^2 + (${tn(z.im)})^2} = ${niceRoot(m) ? `${tpol(null, { mod: m, deg: 0, root: true })} \\approx ${tn(m)}` : tn(m)}${tunit('Ω')} \\\\ \\varphi_{${R(p)}} &= \\operatorname{arctg}\\frac{${tn(z.im)}}{${tn(z.re)}}${quad} = ${tdeg(a)} \\\\ ${Z} &= ${tpol(null, { mod: m, deg: a, unit: 'Ω' })} \\end{aligned}`}
+      />
     )
   }
   steps.push({
@@ -157,8 +138,7 @@ export function buildSteps(task) {
     title: 'Krok 3. Impedancje w postaci wykładniczej',
     mood: 'talk',
     highlight: ['Z'],
-    gnome:
-      `Prąd policzymy z prawa Ohma, czyli dzieleniem. Dzielić najwygodniej w postaci wykładniczej, więc każdą impedancję zamieniamy na moduł i kąt. Rezystor ma kąt 0°, cewka +90°, kondensator −90°. Dla Z = x + jy: moduł √(x² + y²), kąt arctg(y/x). Kalkulator w trybie CMPLX robi to jednym przyciskiem.`,
+    gnome: `Prąd policzymy z prawa Ohma, czyli dzieleniem. Dzielić najwygodniej w postaci wykładniczej, więc każdą impedancję zamieniamy na moduł i kąt. Rezystor ma kąt 0°, cewka +90°, kondensator −90°. Dla $Z = x + jy$: moduł $|Z| = \\sqrt{x^2 + y^2}$, kąt $\\varphi = \\operatorname{arctg}\\frac{y}{x}$. Kalkulator w trybie CMPLX robi to jednym przyciskiem.`,
     trap: `Kąt z arctg sprawdzaj z rysunkiem: jeśli część rzeczywista jest ujemna, do wyniku arctg trzeba dodać 180°.`,
     content: s.sym ? (
       <>
@@ -177,8 +157,7 @@ export function buildSteps(task) {
     title: 'Krok 4. Prądy fazowe z prawa Ohma',
     mood: 'talk',
     highlight: ['I', 'Z'],
-    gnome:
-      `Prąd = napięcie / impedancja. W postaci wykładniczej: moduły DZIELIMY, kąty ODEJMUJEMY (kąt napięcia minus kąt impedancji). Cewka zabiera 90° – prąd spóźnia się za napięciem. Kondensator dodaje 90° – prąd wyprzedza napięcie. Na rezystorze prąd i napięcie idą razem. Rysujemy prądy na wykresie (krótsze strzałki – mają inną skalę).`,
+    gnome: `Prąd = napięcie / impedancja. W postaci wykładniczej moduły DZIELIMY, a kąty ODEJMUJEMY: $\\frac{|U|\\,e^{j\\alpha}}{|Z|\\,e^{j\\varphi}} = \\frac{|U|}{|Z|}\\,e^{j(\\alpha-\\varphi)}$. Cewka zabiera 90° – prąd spóźnia się za napięciem. Kondensator dodaje 90° – prąd wyprzedza napięcie. Na rezystorze prąd i napięcie idą razem.`,
     content: (
       <>
         {PH.map((p) => {
@@ -187,10 +166,11 @@ export function buildSteps(task) {
           const raw = arg(zu) - arg(zz)
           const wrapped = Math.abs(normDeg(raw) - raw) > 1e-6
           return (
-            <Eq key={p} note={wrapped ? `kąt ${fmtNum(raw, { digits: 1 })}° to ten sam kierunek co ${fmtDeg(raw)} (±360°)` : undefined}>
-              <S b="I" s={p} /> = <S b="U" s={p} />/<S b="Z" s={p} /> = <Pol z={zu} /> / <Pol z={zz} /> = {fmtNum(abs(zu) / abs(zz))}·e
-              <sup>j({nDegTerm(arg(zu), arg(zz), '-')})°</sup> = <Pol z={s.I[p]} root unit="A" />
-            </Eq>
+            <Eq
+              key={p}
+              note={wrapped ? `kąt ${fmtNum(raw, { digits: 1 })}° to ten sam kierunek co ${fmtDeg(raw)} (±360°)` : undefined}
+              tex={`${sym('I', p)} = \\frac{${sym('U', p)}}{${sym('Z', p)}} = \\frac{${tpol(zu)}}{${tpol(zz)}} = ${tn(abs(zu) / abs(zz))}\\,e^{${angDiff(arg(zu), arg(zz))}} = ${tpol(s.I[p], { unit: 'A', root: true })}`}
+            />
           )
         })}
       </>
@@ -210,45 +190,39 @@ export function buildSteps(task) {
     mood: INzero ? 'happy' : 'talk',
     highlight: ['N', 'I'],
     gnome: task.neutral
-      ? `Z I prawa Kirchhoffa dla węzła N': wszystko, co wpłynęło trzema przewodami, wraca przewodem neutralnym, więc I_N = I_A + I_B + I_C. DODAWAĆ można tylko w postaci algebraicznej (x + jy) – kalkulator w trybie CMPLX doda postacie wykładnicze sam. ` +
-        (INzero ? `Wyszło zero – tak jest zawsze przy odbiorniku symetrycznym.` : `Na wykresie: przykładamy strzałki jedna za drugą (przerywane), a I_N to strzałka od początku do końca łańcucha.`)
+      ? `Z I prawa Kirchhoffa dla węzła N': wszystko, co wpłynęło trzema przewodami, wraca przewodem neutralnym, więc $I_N = I_A + I_B + I_C$. DODAWAĆ można tylko w postaci algebraicznej (x + jy) – kalkulator w trybie CMPLX zrobi to sam. ` +
+        (INzero ? `Wyszło zero – tak jest zawsze przy odbiorniku symetrycznym.` : `Na wykresie przykładamy strzałki jedna za drugą (przerywane), a I_N to strzałka od początku do końca łańcucha.`)
       : `Bez przewodu neutralnego prądy MUSZĄ się zsumować do zera. To świetne sprawdzenie rachunków – jeśli nie wyjdzie zero, szukaj błędu.`,
-    trap: !INzero ? `I_N to nie suma modułów! ${fmtNum(abs(s.I.A))} + ${fmtNum(abs(s.I.B))} + ${fmtNum(abs(s.I.C))} ≠ ${fmtNum(abs(s.IN))}. Dodajemy wskazy, czyli „strzałki”.` : undefined,
+    trap: !INzero
+      ? `I_N to nie suma modułów! $${tn(abs(s.I.A))} + ${tn(abs(s.I.B))} + ${tn(abs(s.I.C))} \\neq ${tn(abs(s.IN))}$. Dodajemy wskazy, czyli „strzałki”.`
+      : undefined,
     content: (
       <>
         {PH.map((p) => (
-          <Eq key={p}>
-            <S b="I" s={p} /> = <Pol z={s.I[p]} /> = <Alg z={s.I[p]} /> A
-          </Eq>
+          <Eq key={p} tex={`${sym('I', p)} = ${tpol(s.I[p])} = ${talg(s.I[p], 'A')}`} />
         ))}
-        <Eq>
-          <S b="I" s="N" /> = <S b="I" s="A" /> + <S b="I" s="B" /> + <S b="I" s="C" /> = <Alg z={s.IN} unit="A" />
-          {!INzero && <> = <Pol z={s.IN} unit="A" /></>}
-        </Eq>
+        <Eq
+          tex={`\\begin{aligned} ${sym('I', 'N')} &= ${sym('I', 'A')} + ${sym('I', 'B')} + ${sym('I', 'C')} \\\\ &= ${talg(s.IN, 'A')}${INzero ? '' : ` = ${tpol(s.IN, { unit: 'A' })}`} \\end{aligned}`}
+        />
       </>
     ),
     curiosity: (
       <>
         <p>
-          Tak liczy się „na piechotę” (jak na tablicy): każdy wskaz rozpisujemy jako |A|(cos φ + j·sin φ), a potem osobno sumujemy
-          części rzeczywiste i urojone.
+          Tak liczy się „na piechotę” (jak na tablicy): każdy wskaz rozpisujemy jako{' '}
+          <Rich>{'$|A|(\\cos\\varphi + j\\sin\\varphi)$'}</Rich>, a potem osobno sumujemy części rzeczywiste i urojone.
         </p>
         {PH.map((p) => (
-          <CosSin key={p} name="I" sub={p} z={s.I[p]} />
+          <Eq key={p} tex={cosSinTex('I', p, s.I[p])} />
         ))}
-        <Eq>
-          Re: {PH.map((p, i) => (
-            <span key={p}>{i ? ' + ' : ''}({fmtNum(s.I[p].re)})</span>
-          ))}{' '}
-          = {fmtNum(s.IN.re)}, &nbsp; Im: {PH.map((p, i) => (
-            <span key={p}>{i ? ' + ' : ''}({fmtNum(s.I[p].im)})</span>
-          ))}{' '}
-          = {fmtNum(s.IN.im)}
-        </Eq>
+        <Eq
+          tex={`\\begin{aligned} \\operatorname{Re} &: ${PH.map((p) => tparen({ re: s.I[p].re, im: 0 })).join(' + ')} = ${tn(s.IN.re)} \\\\ \\operatorname{Im} &: ${PH.map((p) => tparen({ re: s.I[p].im, im: 0 })).join(' + ')} = ${tn(s.IN.im)} \\end{aligned}`}
+        />
         {!INzero && (
-          <Eq note="powrót do postaci wykładniczej: moduł z Pitagorasa, kąt z arctg (uwaga na ćwiartkę!)">
-            |<S b="I" s="N" />| = √({fmtNum(s.IN.re)}² + {fmtNum(s.IN.im)}²) = {fmtNum(abs(s.IN))} A, φ = {fmtDeg(arg(s.IN))}
-          </Eq>
+          <Eq
+            note="powrót do postaci wykładniczej: moduł z Pitagorasa, kąt z arctg (uwaga na ćwiartkę!)"
+            tex={`|${sym('I', 'N')}| = \\sqrt{(${tn(s.IN.re)})^2 + (${tn(s.IN.im)})^2} = ${tn(abs(s.IN))}\\,\\mathrm{A}, \\quad \\varphi = ${tdeg(arg(s.IN))}`}
+          />
         )}
       </>
     ),
@@ -263,19 +237,13 @@ export function buildSteps(task) {
   })
 
   /* 6. Amperomierz */
-  const ammVal = s.amm
   steps.push({
     key: 'amm',
     title: 'Krok 6. Amperomierz',
     mood: 'talk',
     highlight: ['amm'],
-    gnome: `Amperomierz nie zna kątów – pokazuje tylko wartość skuteczną, czyli MODUŁ prądu, który przez niego płynie. Siedzi w ${where(task.ammeter)}, więc odczytujemy |I_${task.ammeter}|.`,
-    content: (
-      <Eq>
-        (A) = |<S b="I" s={task.ammeter} />| = <N x={ammVal} unit="A" />
-        {niceRoot(ammVal) && <span className="root"> (={niceRoot(ammVal)})</span>}
-      </Eq>
-    ),
+    gnome: `Amperomierz nie zna kątów – pokazuje tylko wartość skuteczną, czyli MODUŁ prądu, który przez niego płynie. Siedzi w ${where(task.ammeter)}, więc odczytujemy $|I_${task.ammeter}|$.`,
+    content: <Eq tex={`\\text{(A)} = |${sym('I', task.ammeter)}| = ${niceRoot(s.amm) ? `${tpol(null, { mod: s.amm, deg: 0, root: true })} \\approx ${tn(s.amm)}` : tn(s.amm)}\\,\\mathrm{A}`} />,
     diagram: {
       vectors: [
         ...vEs(s, true),
@@ -290,41 +258,32 @@ export function buildSteps(task) {
   const toN = w.u[1] === 'N'
   const [a, b] = w.u
   const fwd = !toN && isForward(a, b)
-  const Uw = s.Uw
-  const gnomeU = toN
-    ? `Patrzymy na cewkę napięciową: jeden koniec w przewodzie ${a}, drugi w przewodzie neutralnym. Mierzy więc napięcie FAZOWE U_${a} = E_${a} (bo U_N = 0). Nic nie trzeba odejmować!`
-    : `Patrzymy na cewkę napięciową: łączy przewody ${a} i ${b}, więc mierzy napięcie MIĘDZYFAZOWE U_{${vn}} = U_${a} − U_${b}. Kolejność indeksów jest ważna: pierwszy indeks to przewód z gwiazdką (*). Na wykresie U_{${vn}} to strzałka od końca E_${b} do końca E_${a}. Moduł zawsze wychodzi √3 razy większy od fazowego.`
   steps.push({
     key: 'wattU',
     title: 'Krok 7. Watomierz – które napięcie mierzy?',
     mood: 'think',
     highlight: ['watt'],
-    gnome: gnomeU,
+    gnome: toN
+      ? `Patrzymy na cewkę napięciową: jeden koniec w przewodzie ${a}, drugi w przewodzie neutralnym. Mierzy więc napięcie FAZOWE $U_${a} = E_${a}$ (bo U_N = 0). Nic nie trzeba odejmować!`
+      : `Patrzymy na cewkę napięciową: łączy przewody ${a} i ${b}, więc mierzy napięcie MIĘDZYFAZOWE $U_{${vn}} = U_${a} - U_${b}$. Kolejność indeksów jest ważna: pierwszy indeks to przewód z gwiazdką (*). Na wykresie U_{${vn}} to strzałka od końca E_${b} do końca E_${a}. Moduł zawsze wychodzi $\\sqrt{3}$ razy większy od fazowego.`,
     trap: toN
       ? undefined
       : fwd
-        ? `Skrót: przy kolejności „zgodnej” (AB, BC, CA) napięcie U_{${vn}} wyprzedza E_${a} o 30°: kąt = ${fmtDeg(arg(s.E[a]))} + 30° = ${fmtDeg(arg(Uw))}.`
-        : `Skrót: przy kolejności „pod prąd” (BA, CB, AC) napięcie U_{${vn}} spóźnia się za E_${a} o 30°: kąt = ${fmtDeg(arg(s.E[a]))} − 30° = ${fmtDeg(arg(Uw))}.`,
+        ? `Skrót: przy kolejności „zgodnej” (AB, BC, CA) napięcie U_{${vn}} wyprzedza E_${a} o 30°: $${tdeg(arg(s.E[a]))} + 30^\\circ = ${tdeg(arg(Uw))}$.`
+        : `Skrót: przy kolejności „pod prąd” (BA, CB, AC) napięcie U_{${vn}} spóźnia się za E_${a} o 30°: $${tdeg(arg(s.E[a]))} - 30^\\circ = ${tdeg(arg(Uw))}$.`,
     content: toN ? (
-      <Eq>
-        <S b="U" s={a} /> = <S b="E" s={a} /> = <Pol z={Uw} unit="V" />
-      </Eq>
+      <Eq tex={`${sym('U', a)} = ${sym('E', a)} = ${tpol(Uw, { unit: 'V' })}`} />
     ) : (
-      <>
-        <Eq>
-          <S b="U" s={vn} /> = <S b="U" s={a} /> − <S b="U" s={b} /> = (<Alg z={s.U[a]} />) − (<Alg z={s.U[b]} />) = <Alg z={Uw} /> V
-        </Eq>
-        <Eq note={`|U_{${vn}}| = √3·${fmtNum(Emod)} = ${fmtNum(abs(Uw))} V`}>
-          <S b="U" s={vn} /> = <Pol z={Uw} unit="V" />
-        </Eq>
-      </>
+      <Eq
+        tex={`\\begin{aligned} ${UwSym} &= ${sym('U', a)} - ${sym('U', b)} = ${tparen(s.U[a])} - ${tparen(s.U[b])} \\\\ &= ${talg(Uw, 'V')} \\\\ |${UwSym}| &= \\sqrt{3}\\cdot ${tn(Emod)} = ${tn(abs(Uw))}\\,\\mathrm{V} \\\\ ${UwSym} &= ${tpol(Uw, { unit: 'V' })} \\end{aligned}`}
+      />
     ),
     diagram: {
       vectors: toN
         ? [...vEs(s, true), { id: 'Uw0', z: Uw, kind: 'U', label: 'U', sub: a, color: PHASE_COLOR.W, width: 3.4 }]
         : [
             ...vEs(s, true),
-            { id: 'UwTri', z: Uw, from: s.E[b], kind: 'U', color: PHASE_COLOR.W, dashed: true, label: 'U', sub: vn },
+            { id: 'UwTri', z: Uw, from: s.E[b], kind: 'U', color: PHASE_COLOR.W, dashed: true },
             { id: 'Uw0', z: Uw, kind: 'U', color: PHASE_COLOR.W, width: 3.2, label: 'U', sub: vn },
           ],
       arcs: [],
@@ -346,28 +305,17 @@ export function buildSteps(task) {
     mood: Math.abs(P) < 1e-6 || P < 0 ? 'warn' : 'talk',
     highlight: ['watt'],
     gnome:
-      `Watomierz zawsze liczymy tak samo: |U|·|I|·cos(kąta między nimi). Kąt odczytujemy z wykresu: przesuwamy strzałkę napięcia do początku układu i mierzymy, o ile trzeba ją obrócić, żeby trafić w strzałkę prądu. Rachunkowo to po prostu RÓŻNICA kątów: φ_U − φ_I. Kolejność odejmowania nie ma znaczenia, bo cos(−x) = cos(x).` +
+      `Watomierz zawsze liczymy tak samo: $P = |U|\\cdot|I|\\cdot\\cos\\psi$. Kąt ψ odczytujemy z wykresu: strzałka napięcia stoi w początku układu, mierzymy, o ile trzeba ją obrócić, żeby trafić w strzałkę prądu. Rachunkowo to po prostu RÓŻNICA kątów: $\\psi = \\varphi_U - \\varphi_I$. Kolejność odejmowania nie ma znaczenia, bo $\\cos(-x) = \\cos x$.` +
       extra,
-    trap: `Nie mylimy kąta φ_U − φ_I z kątem samego prądu ani z kątem impedancji! Kąt impedancji to przesunięcie między U_${iw} a I_${iw} – a watomierz może mierzyć inne napięcie.`,
+    trap: `Nie mylimy kąta $\\varphi_U - \\varphi_I$ z kątem samego prądu ani z kątem impedancji! Kąt impedancji to przesunięcie między U_${iw} a I_${iw} – a watomierz może mierzyć inne napięcie.`,
     content: (
-      <>
-        <Eq>
-          <S b="φ" s={'U'} /> = <Deg d={phiU} />, &nbsp; <S b="φ" s={'I'} /> = <Deg d={phiI} />
-        </Eq>
-        <Eq>
-          ψ = ∢(<S b="U" s={vSub} />, <S b="I" s={iw} />) = {fmtNum(phiU, { digits: 1 })}° − ({fmtNum(phiI, { digits: 1 })}°) = <Deg d={psi} />
-        </Eq>
-        <Eq>
-          P = |<S b="U" s={vSub} />|·|<S b="I" s={iw} />|·cos ψ = {fmtNum(abs(Uw))} · {fmtNum(abs(s.I[iw]))} · cos({fmtDeg(psi)})
-        </Eq>
-        <Eq>
-          P = {fmtNum(abs(Uw))} · {fmtNum(abs(s.I[iw]))} · {fmtNum(Math.cos(psi * RAD), { digits: 3 })} = <b><N x={P} unit="W" /></b>
-        </Eq>
-      </>
+      <Eq
+        tex={`\\begin{aligned} \\varphi_U &= ${tdeg(phiU)}, \\qquad \\varphi_I = ${tdeg(phiI)} \\\\ \\psi &= \\varphi_U - \\varphi_I = ${tdeg(phiU)} - (${tdeg(phiI)}) = ${tdeg(psi)} \\\\ P &= |${UwSym}|\\cdot|${sym('I', iw)}|\\cdot\\cos\\psi \\\\ &= ${tn(abs(Uw))}\\cdot ${tn(abs(s.I[iw]))}\\cdot\\cos(${tdeg(psi)}) \\\\ &= ${tn(abs(Uw))}\\cdot ${tn(abs(s.I[iw]))}\\cdot ${tn(Math.cos(psi * RAD), { digits: 3 })} = \\boxed{${tn(P)}\\,\\mathrm{W}} \\end{aligned}`}
+      />
     ),
     diagram: {
       vectors: [
-        { id: 'Uw0', z: Uw, kind: 'U', color: PHASE_COLOR.W, width: 3.2, label: 'U', sub: vSub },
+        { id: 'Uw0', z: Uw, kind: 'U', color: PHASE_COLOR.W, width: 3.2, label: 'U', sub: toN ? a : vn },
         { id: 'Iw', z: s.I[iw], kind: 'I', color: PHASE_COLOR[iw], width: 3, label: 'I', sub: iw },
       ],
       arcs: [{ id: 'psi', a1: phiU, a2: phiI, label: `ψ = ${fmtDeg(Math.abs(psi))}`, color: 'var(--ph-w)' }],
@@ -380,19 +328,12 @@ export function buildSteps(task) {
     title: 'Wynik i pełny wykres wskazowy',
     mood: 'happy',
     highlight: [],
-    gnome: `Gotowe! Na kolokwium zawsze ta sama droga: E → U_N = 0 → Z w postaci wykładniczej → I = U/Z → I_N z Kirchhoffa → przyrządy. Wykres wskazowy rysuj równolegle z obliczeniami – od razu widać, czy kąty mają sens.`,
+    gnome: `Gotowe! Na kolokwium zawsze ta sama droga: E → U_N = 0 → Z w postaci wykładniczej → $I = \\frac{U}{Z}$ → I_N z Kirchhoffa → przyrządy. Wykres wskazowy rysuj równolegle z obliczeniami – od razu widać, czy kąty mają sens.`,
     content: (
       <div className="result">
-        <Eq>
-          <S b="I" s="A" /> = <Pol z={s.I.A} unit="A" />, &nbsp; <S b="I" s="B" /> = <Pol z={s.I.B} unit="A" />, &nbsp;{' '}
-          <S b="I" s="C" /> = <Pol z={s.I.C} unit="A" />
-        </Eq>
-        <Eq>
-          <S b="I" s="N" /> = <Pol z={s.IN} unit="A" />
-        </Eq>
-        <Eq>
-          (A) = <N x={ammVal} unit="A" />, &nbsp; (W) = <N x={P} unit="W" />
-        </Eq>
+        <Eq
+          tex={`\\begin{aligned} ${sym('I', 'A')} &= ${tpol(s.I.A, { unit: 'A' })} & ${sym('I', 'B')} &= ${tpol(s.I.B, { unit: 'A' })} \\\\ ${sym('I', 'C')} &= ${tpol(s.I.C, { unit: 'A' })} & ${sym('I', 'N')} &= ${tpol(s.IN, { unit: 'A' })} \\\\ \\text{(A)} &= ${tn(s.amm)}\\,\\mathrm{A} & \\text{(W)} &= ${tn(P)}\\,\\mathrm{W} \\end{aligned}`}
+        />
       </div>
     ),
     diagram: {
@@ -407,5 +348,3 @@ export function buildSteps(task) {
 
   return { steps, sol: s }
 }
-
-export { Exp }

@@ -23,13 +23,13 @@ const loadProgress = () => {
 
 const STEPS = [
   ['Schemat', 'Czytamy dane, szukamy przewodu N, amperomierza i watomierza.'],
-  ['Źródła', 'E_B = E_A·e^{−j120°}, E_C = E_A·e^{−j240°}.'],
-  ['U_N = 0', 'Przewód N bez oporu (albo symetria) ⇒ U = E.'],
-  ['Impedancje', 'Z = |Z|·e^{jφ}: R → 0°, L → +90°, C → −90°.'],
-  ['Prądy', 'I = U / Z: moduły dzielimy, kąty odejmujemy.'],
-  ['I_N', 'I_N = I_A + I_B + I_C – dodajemy w postaci x + jy.'],
+  ['Źródła', '$E_B = E_A e^{-j120^\\circ}$, $E_C = E_A e^{-j240^\\circ}$'],
+  ['$U_N = 0$', 'Przewód N bez oporu (albo symetria) ⇒ $U = E$'],
+  ['Impedancje', '$Z = |Z|\\,e^{j\\varphi}$: R → 0°, L → +90°, C → −90°'],
+  ['Prądy', '$I = \\dfrac{U}{Z}$: moduły dzielimy, kąty odejmujemy'],
+  ['$I_N$', '$I_N = I_A + I_B + I_C$ – dodajemy w postaci $x + jy$'],
   ['Amperomierz', 'Moduł prądu w jego przewodzie.'],
-  ['Watomierz', 'P = |U|·|I|·cos(φ_U − φ_I).'],
+  ['Watomierz', '$P = |U|\\,|I|\\cos(\\varphi_U - \\varphi_I)$'],
 ]
 
 function Home({ go, progress }) {
@@ -77,7 +77,7 @@ function Home({ go, progress }) {
           <h3>Najtrudniejsze: watomierz</h3>
           <p className="small">
             Cewka prądowa mówi, <b>jaki prąd</b> bierzemy. Cewka napięciowa mówi, <b>jakie napięcie</b>: między przewodem a N to
-            napięcie fazowe, między dwoma przewodami – międzyfazowe (<Rich>{'U_{AB} = U_A − U_B'}</Rich>, √3 razy większe). Kąt to
+            napięcie fazowe, między dwoma przewodami – międzyfazowe (<Rich>{'$U_{AB} = U_A - U_B$'}</Rich>, √3 razy większe). Kąt to
             różnica kątów napięcia i prądu.
           </p>
           <button className="btn small" onClick={() => go('sciaga')}>Zobacz ściągę →</button>
